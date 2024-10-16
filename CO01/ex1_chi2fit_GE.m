@@ -1,5 +1,6 @@
 % CO01 - Exercise 1 - Chi-Squared
 
+
 close all;
 
 %Load Data
