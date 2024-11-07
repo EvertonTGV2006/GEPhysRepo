@@ -3,6 +3,9 @@
 %Ex1: Non linear Equation solver: Lines 3 - 59
 %Ex2: Numerical Integration: Lines 60 - 
 
+
+
+
 %Mathematical Functions: 
 function y = fx(x) %f(x) in Ex1
     y = 3 * exp(-x) -x + 3; % evaluates the function f(x) = 3e^-x - x +3
@@ -20,6 +23,11 @@ function y = hx(x) % 2nd func for Ex2
 y = (sin(100 * pi * x)).^2 * exp(-(x.^2));
 y = y * 2 * pi.^-0.5;
 end
+
+function y = lin(x, a, b)
+    y = a + b * x;
+end
+
 
 
 
@@ -91,9 +99,57 @@ end
 
 %Ex 3
 
+function [a, b] = linearCurveFit(x, y)
+    N = length(x);
+    if length(y) ~= N
+        error("Input arrays of unequal lenght");
+    end
+
+    sumX = 0;
+    sumY = 0;
+    sumXsq = 0;
+    sumXY = 0;
+
+    for i = 1: N
+        sumX =sumX + x(i);
+        sumY = sumY + y(i);
+        sumXsq = sumXsq + x(i).^2;
+        sumXY = sumXY + (x(i) * y(i));
+    end
+
+    matX = [N, sumX; sumX, sumXsq];
+    vecY = [sumY; sumXY];
+
+    vecA = matX\vecY;
+    a = vecA(1);
+    b = vecA(2);
+end
+function r = calculateRMS(y, yFit)
+    rSq = 0;
+    for i = 1 : length(y)
+    rSq = rSq + (yFit(i) - y(i)).^2;
+    end
+    r = rSq.^0.5;
+end
 
 
+function linearFitExecution(fileID, x, y)
+    [a, b] = linearCurveFit(x, y);
+    yFit = zeros(1, length(x)); %Pre allocate for memory performance
+    for i = 1 : length(x)
+        yFit(i) = lin(x(i), a, b);
+    end
+    r = calculateRMS(y, yFit);
 
+    plot(x, y, '.b');
+    hold on;
+    plot(x, yFit, 'r-')
+
+    fprintf(fileID, '%s', ['X, Y, Y_FIT, r = ',num2str(r),', a = ',num2str(a), ', b = ',num2str(b), ',', newline]);
+    for i = 1 : length(x)
+        fprintf(fileID, '%s', [num2str(x(i)), ', ', num2str(y(i)), ', ', num2str(yFit(i)), newline]);
+    end
+end
 
 
 
@@ -107,7 +163,8 @@ end
 
 
 fileID = fopen('GE_CO02_Output.csv', 'w'); %open File for data output
-EXERCISE_NUMBER = input("Select Exercise: (1 - 3): ");
+%EXERCISE_NUMBER = input("Select Exercise: (1 - 3): ");
+EXERCISE_NUMBER = 3;
 %Main code
 switch EXERCISE_NUMBER
     case 1
@@ -161,9 +218,18 @@ switch EXERCISE_NUMBER
 
     case 3
         %Exercise 3: Curve Fitting
-        CALC_ORDER = input("Order of the best fit line to be calculated: 1 = Linear, 2 = Quadratic etc: ");
+        %CALC_ORDER = input("Order of the best fit line to be calculated: 1 = Linear, 2 = Quadratic etc: ");
+        CALC_ORDER = 1;
         switch CALC_ORDER
             case 1
+                data = load("linear.csv");
+
+                x = data(:, 1);
+                y = data(:, 2);
+
+                linearFitExecution(fileID, x, y);
+                
+
         end
 
 end
