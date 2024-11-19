@@ -249,8 +249,8 @@ function [t, x, y, z]  = executeNuclearDecay(tF, dt, tX, tY, x0)
 end
 
 function [x, y, z] = nuclearDecayStep(x, y, z, dt, ax, ay)
-    px = 1 - exp(-ax * dt)
-    py = 1 - exp(-ay * dt)
+    px = 1 - exp(-ax * dt);
+    py = 1 - exp(-ay * dt);
     dx = 0;
     dy = 0;
     for i = 1 : x
