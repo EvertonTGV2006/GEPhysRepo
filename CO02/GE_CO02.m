@@ -33,7 +33,7 @@ end
 
 function [xRoot, i] = bisectionRoots(x1, x2, acc) %x1, x2 are inputs of opposite sign, acc is number of dp of accuracy
 y1 = fx(x1);
-y2 = fx(x2);
+y2 = fx(x2); %#ok<NASGU>
 i = 0;
 
 accCheck = false;
@@ -46,7 +46,7 @@ while accCheck ==false
         y1 = y3; % if y1 & y3 are of the same sign, assign y3,x3 to y1,x1
         x1 = x3; % could only reassign x, but copying y eliminates an additional call to f(x) each iteration and is more performant
     else
-        y2 = y3; %if not then must be of same sign as y2 & x2, so assign to those instead
+        y2 = y3; %#ok<NASGU> %if not then must be of same sign as y2 & x2, so assign to those instead
         x2 = x3;
     end
     if round(x1, acc) == round(x2, acc)% now carry out accuracy checks, if the rounded versions match we have converged on a root to acc many d.p. so we can break out of the loop
@@ -248,6 +248,27 @@ function [t, x, y, z]  = executeNuclearDecay(tF, dt, tX, tY, x0)
     end
 end
 
+function [x, y, z] = nuclearDecayStep(x, y, z, dt, ax, ay)
+    px = 1 - exp(-ax * dt)
+    py = 1 - exp(-ay * dt)
+    dx = 0;
+    dy = 0;
+    for i = 1 : x
+        if px > rand()
+            dx = dx + 1;
+        end
+    end
+    for j = 1 : y
+        if py > rand()
+            dy = dy + 1;
+        end
+    end
+    z = z + dy;
+    y = y + dx - dy;
+    x = x - dx;
+end
+
+
 
 
 
@@ -346,6 +367,46 @@ switch EXERCISE_NUMBER
         hold on;
         plot(t, y, 'r-');
         plot(t, z, 'g-');
+        hold off;
+
+        N = 51;
+
+
+        ax = log(2) / HALF_LIFE_X;
+        ay = log(2) / HALF_LIFE_Y;
+
+        x(1) = 1000;
+        year = zeros(N);
+
+        for i = 1 : N - 1
+            [x(i+1), y(i+1), z(i+1)] = nuclearDecayStep(x(i), y(i), z(i), 1, ax, ay);
+            year(i) = i - 1;
+        end
+        result = [transpose(x), transpose(y), transpose(z)];
+        
+
+        size(year)
+        size(result)
+
+        bar( result, "stacked");
+            
+        result;
+        STEP = 0.1;
+        N = 50;
+        x = 1000;
+        y = 0;
+        z = 0;
+        for i = 1 : N / STEP
+            [x, y, z] = nuclearDecayStep(x, y, z, STEP, ax, ay);
+            bar(i * STEP, [x, y, z], "stacked");
+            legend("X", "Y", "Z");
+            pause(0.05);
+        end
+
+
+
+
+
 
 
 end
