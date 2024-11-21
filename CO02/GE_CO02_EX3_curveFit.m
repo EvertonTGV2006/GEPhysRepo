@@ -66,9 +66,12 @@ function linearFitExecution(fileID, x, y)
 
     r = calculateRMS(y, yFit); %calculate final RMS
 
+    figure();
     plot(x, y, '.b'); %now plot data to visualise
     hold on;
     plot(x, yFit, 'r-')
+    annotation('textbox',[.2 .9 0 0],'String',["RMS for Line:", r],'FitBoxToText','on');
+    annotation('textbox',[.6 .4 0 0],'String',["y = ",a," + ",b,"x"], 'FitBoxToText','on');
 
     fprintf(fileID, '%s', ['X, Y, Y_FIT, r = ',num2str(r),', a = ',num2str(a), ', b = ',num2str(b), ',', newline]); %and write out raw Data to .csv
     for i = 1 : length(x)
@@ -129,11 +132,13 @@ function [a, yFit, r] = polynomialFit(x, y, m)
         end
     end
 
+    figure()
     plot(x, y, 'b.'); %plot to visulaise data
     hold on
     plot(x, yFit, 'r-');
     r = calculateRMS(y, yFit);
     annotation('textbox',[.2 .9 0 0],'String',["RMS for Polynomial:", r],'FitBoxToText','on')
+    annotation('textbox',[.6 .9 0 0],'String',["y = ",a(1)," + ",a(2),"x + ",a(3),"x^2 + ",a(4),"x^3"], 'FitBoxToText','on');
     
 
 
