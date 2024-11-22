@@ -52,7 +52,7 @@ end
 
 %Start of Main block 
 
-fileID = fopen('GE_CO02_Output.csv', 'w'); %open File for data output
+fileID = fopen('GE_CO02_Output_EX4.csv', 'w'); %open File for data output
 
 %HALF_LIFE_X = input("Half life of element X (Years): ");
 %HALF_LIFE_Y = input("Half life of element Y (Years): ");
@@ -75,34 +75,76 @@ hold on;
 plot(t, y, 'r-');
 plot(t, z, 'g-');
 hold off;
+legend("X", "Y", "Z");
+
+fclose(fileID);
+READ_COEFF = true;
+
+if READ_COEFF == true
+    data = load('GE_CO02_Input_EX4.csv');
+    HX = data(:,1);
+    HY = data(:,2);
+
+    for j = 1:length(HX)
+        filePath = strcat('GE_CO02_Output_EX4_',num2str(i),'.csv');
+        fileID = fopen(filePath, 'w');
+
+        [t, x, y, z] = executeNuclearDecay(50, 1, HX(j), HY(j), 1000); %Run the first nuclear decay with analytical solutions
+
+        %Output Data to file
+        fprintf(fileID, '%s', ["t, x, y, z",newline]);
+        for i = 1 : length(t)
+            fprintf(fileID, '%s', [num2str(t(i)), ', ', num2str(x(i), 3), ', ', num2str(y(i), 3), ', ', num2str(z(i), 3), newline]);
+        end
+
+
+        %Plot X,Y,Z on a graph to visualise data for the analytical solution
+        plot(t, x, 'b-');
+        hold on;
+        plot(t, y, 'r-');
+        plot(t, z, 'g-');
+        hold off;
+        pltTitle = strcat('H_X: ', num2str(HX(j)), ' H_Y: ', num2str(HY(j)));
+        title(pltTitle);
+        legend("X", "Y", "Z");
+
+        pause(3);
+    end
+end
+
 
 pause(10);
-%Now for the animation / time step probabilistic approach
+
+RENDER = false;
+if RENDER ==true
+
+    %Now for the animation / time step probabilistic approach
 
 
-%Initialise variables
-ax = log(2) / HALF_LIFE_X;
-ay = log(2) / HALF_LIFE_Y;
-STEP = 0.1;
-N = 50;
-x = 1000;
-y = 0;
-z = 0;
+    %Initialise variables
+    ax = log(2) / HALF_LIFE_X;
+    ay = log(2) / HALF_LIFE_Y;
+    STEP = 0.1;
+    N = 50;
+    x = 1000;
+    y = 0;
+    z = 0;
 
-%And execute loop N / step times, in this case 500 times
-for i = 1 : N / STEP
-    [x, y, z] = nuclearDecayStep(x, y, z, STEP, ax, ay); %Run the decay probabilites on current population values;
+    %And execute loop N / step times, in this case 500 times
+    for i = 1 : N / STEP
+        [x, y, z] = nuclearDecayStep(x, y, z, STEP, ax, ay); %Run the decay probabilites on current population values;
 
-    %plot on a graph
-    bar(i * STEP, [x, y, z], "stacked");
+        %plot on a graph
+        bar(i * STEP, [x, y, z], "stacked");
 
-    xleg = "X: " + num2str(x);
-    yleg = "Y: " + num2str(y);
-    zleg = "Z: " + num2str(z);
-    legend(xleg, yleg, zleg);
+        xleg = "X: " + num2str(x);
+        yleg = "Y: " + num2str(y);
+        zleg = "Z: " + num2str(z);
+        legend(xleg, yleg, zleg);
 
-    %Add the pause to control animation speed
-    pause(0.05);
+        %Add the pause to control animation speed
+        pause(0.005);
+    end
 end
 
 

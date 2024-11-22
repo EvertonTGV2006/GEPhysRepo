@@ -50,6 +50,7 @@ function r = calculateRMS(y, yFit)
     end
 
     r = rSq.^0.5; %root the return value at the end
+    r = r /length(y); %divide by number of points N
 end
 
 
@@ -166,7 +167,7 @@ end
 
 %start of Main block
 
-fileID = fopen('GE_CO02_Output.csv', 'w'); %open File for data output
+fileID = fopen('GE_CO02_Output_EX3.csv', 'w'); %open File for data output
 
 data = load("linear.csv"); %Load sample input data for the linear case
 

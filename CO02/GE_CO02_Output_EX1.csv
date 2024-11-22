@@ -1,0 +1,4 @@
+Method Used:, Calculated Value, Number of Iterations
+Bisection Method:, 3.13101972, 37
+Newton-Raphson Method:, 3.13101972, 4
+MATLAB fzero() Method:, 3.13101972

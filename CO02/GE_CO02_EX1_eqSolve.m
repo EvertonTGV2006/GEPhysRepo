@@ -80,7 +80,7 @@ end
 
 %start of Main Block
 
-fileID = fopen('GE_CO02_Output.csv', 'w'); %open File for data output
+fileID = fopen('GE_CO02_Output_EX1.csv', 'w'); %open File for data output
 
 
 % Find root about x = 3; so take x1 = 2  and x2 = 4, let acc = 10d.p

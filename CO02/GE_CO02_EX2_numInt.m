@@ -30,7 +30,7 @@ function area = simpsonsRule(fx, x1, x2, n)
     area = workingSum * h / 3;
 end
 
-fileID = fopen('GE_CO02_Output.csv', 'w'); %open File for data output
+fileID = fopen('GE_CO02_Output_EX2.csv', 'w'); %open File for data output
     
 %Initialse all the variables
 X_Values = transpose([0.2, 0.4, 0.6, 0.8, 1.0]);
