@@ -78,7 +78,7 @@ hold off;
 legend("X", "Y", "Z");
 
 fclose(fileID);
-READ_COEFF = true;
+READ_COEFF = false;
 
 if READ_COEFF == true
     data = load('GE_CO02_Input_EX4.csv');
@@ -115,7 +115,7 @@ end
 
 pause(10);
 
-RENDER = false;
+RENDER = true;
 if RENDER ==true
 
     %Now for the animation / time step probabilistic approach

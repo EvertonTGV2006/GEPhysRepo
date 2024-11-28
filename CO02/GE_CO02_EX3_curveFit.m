@@ -147,11 +147,11 @@ end
 
 function polynomialFitExecute(fileID)
     %function to call the above polynomial fit functions
-    aReal = [1.5, -2.5, 0.7, -1.2]; %Initialise our actual aReal coefficients
+    aReal = [1.5, -2.5, 0.7, -1.2, 0.2, 0.7, -0.7]; %Initialise our actual aReal coefficients
 
-    [x, y] = polynomialGenerator(100, 3, aReal, 1); % generate a polynomial with noise based on these coefficients
+    [x, y] = polynomialGenerator(100, 6, aReal, 10); % generate a polynomial with noise based on these coefficients
 
-    [aFit, yFit, r] = polynomialFit(x, y, 3); %Run the polynomial fitting function
+    [aFit, yFit, r] = polynomialFit(x, y, 6); %Run the polynomial fitting function
 
     %now write Data out to the .csv
     fprintf(fileID, '%s', 'X:,Y:,Y_FIT,y = ');
