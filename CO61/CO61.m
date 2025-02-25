@@ -1,4 +1,4 @@
-function [ tout , pos ] = simulate_rocket ( init_pos , init_vel , moon_pos , t)
+function [ tout , pos, rMin ] = simulate_rocket ( init_pos , init_vel , moon_pos , t)
     % Author: ??? , Date: ??/??/????
     % Simulate the rocket trajectory with the Earth and Moon influence. The coordinate
     % used in this function is centred at Earth’s centre (i.e. Earth centre at (0,0) )
@@ -38,6 +38,7 @@ function [ tout , pos ] = simulate_rocket ( init_pos , init_vel , moon_pos , t)
     MEarth = 83.3;
     MMoon = 1;
     
+    rMin = 222;
 
     for i = 2:timesteps
         %compute earth - Sep
@@ -50,22 +51,88 @@ function [ tout , pos ] = simulate_rocket ( init_pos , init_vel , moon_pos , t)
         v = v + a * dt;
         pos(i,:) = pos(i-1,:) + v * dt;
         tout(i) = t(i);
+        rMin = min(rMin, sqrt(sum(r.^2)));
+        
+    end
+end
 
+function plotPath(t, p, moon_pos)
+    hold off;
+    x = p(:,1);
+    y = p(:,2);
+    col = t;
+    scatter(x, y, [], col, 'fill');
+    hold on;
+
+
+
+    %plot moon;
+    mp = zeros(length(t),2);
+
+    for i = 1:length(t)
+        mp(i,:) = moon_pos(t(i));
     end
 
+    mx = mp(:,1);
+    my = mp(:,2);
+    scatter(mx, my, [], col, 'fill');
+
+    axis([-300 300 -300 300])
+    shg;
+    grid on;
+end
+
+moon_pos = @(t) [222*cos(2.6615e-6*t), 222*sin(2.6615e-6*t)];
+% moon_pos = @(t) [0, 222];
+
+function [t, p, theta] = findLaunchAngle(moon_pos)
+    v0 = 0.0066;
+    thetas = 0:pi/4:pi;
+    rMin = 222;
+    thetaRes = 0;
+    for i = 1:length(thetas)
+        v = [v0 * cos(thetas(i)), v0 * sin(thetas(i))];
+        [t, p, rMr] = simulate_rocket([0, 3.7], v, moon_pos, 0:10:2000000);
+        plotPath(t, p, moon_pos);
+        thetas(i)
+        rMr
+        if rMr < rMin
+            thetaRes = thetas(i);
+            rMin = rMr;
+        end
+    end
+    dtheta = 0.1
+    theta2 = thetaRes + dtheta;
+    drdt = 0;
+    for i = 1:10
+        v = [v0 * cos(theta2), v0 * sin(theta2)];
+        [t, p, rMr2] = simulate_rocket([0, 3.7], v, moon_pos, 0:10:2000000);
+        plotPath(t, p, moon_pos);
+        drdt = (rMr2 - rMr )/dtheta
+        dtheta = -rMr2 / drdt
+        if (dtheta > 0.1)
+            dtheta = 0.1
+            dtheta = dtheta * rMr2;
+        end
+        if (dtheta < -0.1)
+            dtheta = -0.1
+            dtheta = dtheta * rMr2;
+        end
+        
+        theta2 = theta2 + dtheta
+        rMr = rMr2
+        if(rMr < 0.1)
+            break
+        end
+    end
+    theta = theta2;
 
 end
 
 
-moon_pos = @(t) [222*cos(2.6615e-6*t), 222*sin(2.6615e-6*t)];
+[t, p, theta] = findLaunchAngle(moon_pos);
 
-v0 = 0.0066;
-theta = 89.9 * pi/180;
-v = [v0 * cos(theta), v0 * sin(theta)];
-[t, p] = simulate_rocket([0, 3.7], v, moon_pos, 0:10:200000);
-plot(p(:,1),p(:,2))
-axis([-300 300 -300 300])
+"Best launch angle: "
+theta_deg = theta * 180 / pi
 
 
-
-    
